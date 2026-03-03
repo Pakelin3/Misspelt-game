@@ -33,9 +33,13 @@ version_control/autoload_on_startup=true
 [file_customization]
 
 folder_colors={
+"res://characters/": "red",
+"res://core/": "yellow",
+"res://entities/": "purple",
 "res://fonts/": "gray",
 "res://images/": "blue",
-"res://scenes/": "purple"
+"res://scenes/": "purple",
+"res://ui/": "green"
 }
 
 [input]
