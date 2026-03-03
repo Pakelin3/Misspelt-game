@@ -17,8 +17,8 @@ config/icon="res://icon.svg"
 
 [autoload]
 
-EventBus="*res://scenes/EventBus.gd"
-GameManager="*res://GameManager.gd"
+EventBus="*res://core/autoloads/EventBus.gd"
+GameManager="*res://core/autoloads/GameManager.gd"
 
 [display]
 

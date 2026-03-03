@@ -1,0 +1,40 @@
+[gd_scene format=3 uid="uid://b7yxwrn3jqgbs"]
+
+[ext_resource type="FontFile" uid="uid://df757qywvpggq" path="res://fonts/Press_Start_2P/PressStart2P-Regular.ttf" id="1_0mp8s"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_60v1v"]
+bg_color = Color(0.24313726, 0.14901961, 0.11372549, 1)
+corner_detail = 1
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_0mp8s"]
+content_margin_left = 15.0
+content_margin_top = 15.0
+content_margin_right = 15.0
+content_margin_bottom = 15.0
+bg_color = Color(0.9019608, 0.8627451, 0.7764706, 1)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.24313726, 0.14901961, 0.11372549, 1)
+
+[node name="ShadowContainer" type="Button" unique_id=683037152]
+process_mode = 3
+offset_right = 8.0
+offset_bottom = 8.0
+theme_override_fonts/font = ExtResource("1_0mp8s")
+theme_override_styles/normal = SubResource("StyleBoxFlat_60v1v")
+
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=339992646]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 4
+
+[node name="MainCard" type="PanelContainer" parent="MarginContainer" unique_id=646483736]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_0mp8s")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/MainCard" unique_id=1655684483]
+layout_mode = 2

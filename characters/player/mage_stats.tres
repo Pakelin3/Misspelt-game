@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="PlayerStats" load_steps=2 format=3 uid="uid://mage_stats_uid"]
+
+[ext_resource type="Script" path="res://characters/player/PlayerStats.gd" id="1_mage"]
+
+[resource]
+script = ExtResource("1_mage")
+max_hp = 100
+attack_damage = 10
+speed = 350.0
+acceleration = 50.0
+additional_projectiles = 0

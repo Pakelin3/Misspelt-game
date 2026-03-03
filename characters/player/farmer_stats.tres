@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="PlayerStats" load_steps=2 format=3 uid="uid://farmer_stats_uid"]
+
+[ext_resource type="Script" path="res://characters/player/PlayerStats.gd" id="1_farmer"]
+
+[resource]
+script = ExtResource("1_farmer")
+max_hp = 120
+attack_damage = 8
+speed = 300.0
+acceleration = 50.0
+additional_projectiles = 1
