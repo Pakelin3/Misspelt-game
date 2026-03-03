@@ -1,0 +1,20 @@
+[gd_scene format=3 uid="uid://bm4lb60a4r6qc"]
+
+[ext_resource type="Script" uid="uid://bhmwfl1vdu4wg" path="res://entities/misc/BigRock.gd" id="1_4qf7h"]
+[ext_resource type="Texture2D" uid="uid://d4agr52532h8x" path="res://images/assets/rock.png" id="1_vw2a0"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_4qf7h"]
+size = Vector2(116, 60)
+
+[node name="BigRock" type="StaticBody2D" unique_id=1883984123]
+collision_layer = 3
+collision_mask = 3
+script = ExtResource("1_4qf7h")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1947866965]
+scale = Vector2(2, 3)
+texture = ExtResource("1_vw2a0")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=200310011]
+position = Vector2(0, 15)
+shape = SubResource("RectangleShape2D_4qf7h")

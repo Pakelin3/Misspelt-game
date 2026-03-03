@@ -1,0 +1,20 @@
+[gd_scene format=3 uid="uid://rhjaiu1m4r40"]
+
+[ext_resource type="Script" uid="uid://yelkatwg6s4h" path="res://entities/misc/DestructibleRock.gd" id="1_0aypr"]
+[ext_resource type="Texture2D" uid="uid://d4agr52532h8x" path="res://images/assets/rock.png" id="2_gjptv"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_7xt3g"]
+size = Vector2(78, 29)
+
+[node name="DestructibleRock" type="StaticBody2D" unique_id=518778647 groups=["obstacle"]]
+collision_layer = 3
+collision_mask = 3
+script = ExtResource("1_0aypr")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=651778461]
+scale = Vector2(1.5, 1.5)
+texture = ExtResource("2_gjptv")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=728959916]
+position = Vector2(-1, 7.5)
+shape = SubResource("RectangleShape2D_7xt3g")

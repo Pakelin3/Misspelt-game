@@ -127,7 +127,7 @@ func update_erudit_orbit(delta):
 
 func check_book_damage(book: Area2D):
 	for body in book.get_overlapping_bodies():
-		if body.is_in_group("enemy") and body.has_method("take_damage"):
+		if (body.is_in_group("enemy") or body.is_in_group("obstacle")) and body.has_method("take_damage"):
 			if not erudit_hit_cooldowns.has(body):
 				body.take_damage(attack_damage)
 				erudit_hit_cooldowns[body] = 0.5

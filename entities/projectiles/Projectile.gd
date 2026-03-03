@@ -18,7 +18,11 @@ func _physics_process(delta):
 func _on_body_entered(body):
 	if not is_active: return
 	if body.is_in_group("player"): return
-		
+	if body.is_in_group("obstacle"):
+		if body.has_method("take_damage"):
+			body.take_damage(damage)
+		call_deferred("deactivate")
+		return
 	if body.has_method("take_damage"):
 		body.take_damage(damage)
 		call_deferred("deactivate")

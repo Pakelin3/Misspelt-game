@@ -15,12 +15,9 @@ signal upgrade_selected(choice: int)
 @onready var card2 = $LevelUpPanel/HBoxContainer/Card2
 @onready var card3 = $LevelUpPanel/HBoxContainer/Card3
 
-# --- CARGAMOS LA FUENTE MANUALMENTE ---
 var custom_font = preload("res://fonts/Press_Start_2P/PressStart2P-Regular.ttf")
 
 func _ready():
-	# Enlazar la lógica existente del botón a CardUI (asumiendo que las cartas son Button en la escena actual)
-	# Les asignamos el nuevo script desde código para no romper la escena
 	card1.set_script(preload("res://ui/hud/CardUI.gd"))
 	card2.set_script(preload("res://ui/hud/CardUI.gd"))
 	card3.set_script(preload("res://ui/hud/CardUI.gd"))
