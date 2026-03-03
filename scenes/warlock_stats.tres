@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="PlayerStats" load_steps=2 format=3 uid="uid://warlock_stats_uid"]
+
+[ext_resource type="Script" path="res://scenes/PlayerStats.gd" id="1_warlock"]
+
+[resource]
+script = ExtResource("1_warlock")
+max_hp = 80
+attack_damage = 12
+speed = 200.0
+acceleration = 40.0
+additional_projectiles = 0
