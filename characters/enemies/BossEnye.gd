@@ -73,11 +73,10 @@ func shoot_tilde():
 func take_damage(amount: int):
 	if not is_active: return
 	current_hp -= amount
-	
-	var original_color = modulate
-	modulate = Color.RED
+
+	modulate = Color(2.5, 2.5, 2.5)
 	var tween = create_tween()
-	tween.tween_property(self, "modulate", original_color, 0.1)
+	tween.tween_property(self, "modulate", Color.WHITE, 0.15)
 
 	if current_hp <= 0:
 		die()
@@ -85,10 +84,8 @@ func take_damage(amount: int):
 func die():
 	is_active = false
 	print("¡La Ñ ha sido domada!")
-	
-	# Opcional: Soltar una súper gema de experiencia
 	var drop = preload("res://entities/items/XPGem.tscn").instantiate()
-	drop.xp_value = 150 # XP masiva
+	drop.xp_value = 150
 	drop.global_position = global_position
 	get_tree().current_scene.call_deferred("add_child", drop)
 	

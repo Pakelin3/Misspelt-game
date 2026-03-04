@@ -1,0 +1,76 @@
+[gd_scene format=3 uid="uid://cg2npa7wxyb3v"]
+
+[ext_resource type="Script" uid="uid://x3ndc3fyufbq" path="res://ui/pause_menu/PauseMenu.gd" id="1_c0ded"]
+[ext_resource type="FontFile" uid="uid://df757qywvpggq" path="res://fonts/Press_Start_2P/PressStart2P-Regular.ttf" id="2_dyg54"]
+
+[node name="PauseMenu" type="CanvasLayer" unique_id=2081365034]
+process_mode = 3
+layer = 100
+script = ExtResource("1_c0ded")
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=1139625749]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.705882)
+
+[node name="CenterContainer" type="CenterContainer" parent="." unique_id=1022390094]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer" unique_id=1996772678]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="Label" type="Label" parent="CenterContainer/VBoxContainer" unique_id=1355060488]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_dyg54")
+theme_override_font_sizes/font_size = 64
+text = "PAUSA"
+horizontal_alignment = 1
+
+[node name="ResumeButton" type="Button" parent="CenterContainer/VBoxContainer" unique_id=3054484]
+custom_minimum_size = Vector2(250, 60)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_dyg54")
+theme_override_font_sizes/font_size = 32
+text = "Reanudar"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CenterContainer/VBoxContainer" unique_id=2035592252]
+layout_mode = 2
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="VolumeLabel" type="Label" parent="CenterContainer/VBoxContainer/HBoxContainer" unique_id=1406217005]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("2_dyg54")
+theme_override_font_sizes/font_size = 32
+text = "Volumen"
+
+[node name="VolumeSlider" type="HSlider" parent="CenterContainer/VBoxContainer/HBoxContainer" unique_id=1520416840]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+size_flags_vertical = 4
+min_value = -40.0
+max_value = 10.0
+
+[node name="ExitButton" type="Button" parent="CenterContainer/VBoxContainer" unique_id=1993282110]
+custom_minimum_size = Vector2(250, 60)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85490197, 0.25882354, 0.32941177, 1)
+theme_override_fonts/font = ExtResource("2_dyg54")
+theme_override_font_sizes/font_size = 32
+text = "Salir"
+
+[node name="ConfirmationDialog" type="ConfirmationDialog" parent="." unique_id=858417912]
+title = "Salir del juego"
+initial_position = 2
+size = Vector2i(350, 150)
+ok_button_text = "Sí"
+dialog_text = "¿Seguro que quieres salir?"
+cancel_button_text = "No"
