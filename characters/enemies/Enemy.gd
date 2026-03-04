@@ -53,6 +53,14 @@ func die():
 	print("Enemigo derrotado")
 	emit_signal("enemy_died", global_position, my_char)
 	
+	var sfx = AudioStreamPlayer2D.new()
+	sfx.stream = preload("res://music/letter_death.mp3")
+	sfx.volume_db = -18.0 
+	sfx.global_position = global_position
+	get_tree().current_scene.call_deferred("add_child", sfx)
+	sfx.call_deferred("play")
+	sfx.finished.connect(sfx.queue_free)
+	
 	call_deferred("deactivate")
 
 func deactivate():

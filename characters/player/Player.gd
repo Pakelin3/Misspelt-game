@@ -43,13 +43,25 @@ var erudit_current_angle: float = 0.0
 var active_books: Array = []
 var erudit_hit_cooldowns: Dictionary = {}
 
+var mage_attack_sfx: AudioStreamPlayer
+
 func _ready():
 	randomize()
 	var my_skin = GameManager.game_data["skin"]
 	setup_skin(my_skin)
 	
+	mage_attack_sfx = AudioStreamPlayer.new()
+	mage_attack_sfx.stream = preload("res://music/mage_attack.mp3")
+	mage_attack_sfx.volume_db = -12.0
+	add_child(mage_attack_sfx)
+	
 	shoot_timer.timeout.connect(weapon_pivot.shoot)
+	shoot_timer.timeout.connect(_play_mage_attack_sound)
 	$GameTimer.timeout.connect(_on_game_timer_timeout)
+
+func _play_mage_attack_sound():
+	if GameManager.game_data.has("skin") and GameManager.game_data["skin"] == "mage":
+		mage_attack_sfx.play()
 	
 	# Inicializar UI
 	hud.initialize_stats(max_hp, xp_required)
@@ -319,6 +331,12 @@ func clean_floor_letters():
 # --- EVENTOS Y GAME OVER ---
 
 func die():
+	var sfx = AudioStreamPlayer.new()
+	sfx.stream = preload("res://music/game_over.mp3")
+	sfx.process_mode = Node.PROCESS_MODE_ALWAYS
+	add_child(sfx)
+	sfx.play()
+
 	get_tree().paused = true
 	set_physics_process(false)
 	weapon_pivot.set_physics_process(false)
