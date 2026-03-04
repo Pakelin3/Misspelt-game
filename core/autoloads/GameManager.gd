@@ -2,9 +2,9 @@ extends Node
 
 # --- DATOS DE SESIÓN ---
 var game_data = {
-	"skin": "erudit",
+	"skin": "mage",
 	"token": "",
-	"difficulty": 2
+	"difficulty": 1
 }
 
 var mission_words: Array = [] 

@@ -19,6 +19,7 @@ config/icon="res://icon.svg"
 
 EventBus="*res://core/autoloads/EventBus.gd"
 GameManager="*res://core/autoloads/GameManager.gd"
+MusicManager="*res://core/autoloads/MusicManager.gd"
 
 [display]
 
@@ -38,6 +39,7 @@ folder_colors={
 "res://entities/": "purple",
 "res://fonts/": "gray",
 "res://images/": "blue",
+"res://music/": "teal",
 "res://scenes/": "purple",
 "res://ui/": "green"
 }

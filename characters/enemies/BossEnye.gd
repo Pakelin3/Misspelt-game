@@ -92,4 +92,5 @@ func die():
 	drop.global_position = global_position
 	get_tree().current_scene.call_deferred("add_child", drop)
 	
+	EventBus.boss_enye_died.emit()
 	queue_free()

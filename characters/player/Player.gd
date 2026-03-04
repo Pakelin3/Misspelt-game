@@ -215,6 +215,7 @@ func level_up():
 	hud.update_level(level, xp_required)
 	hud.update_xp(current_xp) 
 	get_tree().paused = true
+	MusicManager.lower_volume()
 	
 	var rand_stat = randi() % 3
 	
@@ -285,6 +286,7 @@ func apply_upgrade(choice: int):
 		
 	hud.hide_level_up_panel()
 	get_tree().paused = false
+	MusicManager.restore_volume()
 
 # --- SISTEMA DE PALABRAS ---
 
