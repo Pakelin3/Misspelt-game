@@ -93,6 +93,7 @@ func game_event_word_completed():
 
 func _pause_and_call_js():
 	get_tree().paused = true
+	MusicManager.pause_music()
 	_js_window.triggerQuiz(target_word)
 
 
@@ -118,6 +119,7 @@ func _handle_quiz_result_deferred(args):
 	
 	quiz_active = false
 	get_tree().paused = false 
+	MusicManager.resume_music()
 	
 	if OS.has_feature("web"):
 		JavaScriptBridge.eval("window.focus();")

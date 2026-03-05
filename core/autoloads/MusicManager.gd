@@ -57,6 +57,14 @@ func restore_volume():
 	tween.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
 	tween.tween_property(level_player, "volume_db", normal_volume, 0.5)
 
+func pause_music():
+	level_player.stream_paused = true
+	boss_player.stream_paused = true
+
+func resume_music():
+	level_player.stream_paused = false
+	boss_player.stream_paused = false
+
 func _on_boss_spawned():
 	level_player.stop()
 	

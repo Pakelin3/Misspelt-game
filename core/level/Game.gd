@@ -102,7 +102,7 @@ func setup_easy_world():
 		player.get_node("AmbientParticles").emitting = true
 
 func setup_normal_world():
-	update_bg_tiling(preload("res://images/assets/rocks.png"), Vector2(2, 2), Color(0.5, 0.5, 0.5))
+	update_bg_tiling(preload("res://images/assets/rocks.png"), Vector2(2, 2), Color.WHITE)
 	bg_grass.material = null
 	
 	clouds_layer.hide()
@@ -134,7 +134,7 @@ func _process(delta):
 func _on_prop_spawn():
 	var difficulty = int(GameManager.game_data.get("difficulty", 2))
 	if difficulty == 1: 
-		return # En modo fácil no hay obstáculos
+		return
 		
 	if not is_instance_valid(player):
 		return
@@ -148,11 +148,9 @@ func _on_prop_spawn():
 	var r = randf()
 	
 	if difficulty >= 3:
-		# Mundo difícil: Libros 40%, Rocas 40%, Rocas Grandes 20%
 		prop_instance = pile_book_scene.instantiate()
 
 	else:
-		# Mundo normal: Solo rocas
 		if r < 0.8:
 			prop_instance = destructible_rock_scene.instantiate()
 		else:
