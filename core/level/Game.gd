@@ -12,7 +12,12 @@ var destructible_rock_scene = preload("res://entities/misc/DestructibleRock.tscn
 var big_rock_scene = preload("res://entities/misc/BigRock.tscn")
 var prop_timer: Timer
 
+var magic_material: ShaderMaterial
+
 func _ready():
+	magic_material = ShaderMaterial.new()
+	magic_material.shader = preload("res://core/level/RandomOpacity.gdshader")
+	
 	prop_timer = Timer.new()
 	prop_timer.wait_time = 3.0
 	prop_timer.autostart = false
@@ -57,7 +62,8 @@ func update_bg_tiling(new_texture: Texture, new_scale: Vector2, new_color: Color
 	parallax_layer.motion_mirroring = Vector2(base_size * new_scale.x, base_size * new_scale.y)
 
 func setup_easy_world():
-	update_bg_tiling(preload("res://images/assets/grass.png"), Vector2(1.0, 1.0), Color.WHITE)
+	update_bg_tiling(preload("res://images/assets/grass.png"), Vector2(2.0, 2.0), Color.WHITE)
+	bg_grass.material = null
 	clouds_layer.show()
 	generate_flowers(40)
 	
@@ -66,6 +72,7 @@ func setup_easy_world():
 
 func setup_normal_world():
 	update_bg_tiling(preload("res://images/assets/rocks.png"), Vector2(2, 2), Color(0.5, 0.5, 0.5))
+	bg_grass.material = null
 	
 	clouds_layer.hide()
 	if player.has_node("AmbientParticles"):
@@ -74,6 +81,8 @@ func setup_normal_world():
 	prop_timer.start(2.5)
 
 func setup_hard_world():
+	update_bg_tiling(preload("res://images/assets/magic_tile.png"), Vector2(2, 2), Color.WHITE)
+	bg_grass.material = magic_material
 	clouds_layer.hide()
 	if player.has_node("AmbientParticles"):
 		player.get_node("AmbientParticles").emitting = false
@@ -82,7 +91,7 @@ func _process(delta):
 	if clouds_layer.visible:
 		clouds_layer.motion_offset += Vector2(15.0, 10.0) * delta
 
-# --- EL GENERADOR INFINITO DE ROCAS ---
+# --- GENERADOR INFINITO DE ROCAS ---
 func _on_prop_spawn():
 	var difficulty = int(GameManager.game_data.get("difficulty", 2))
 	if difficulty != 2: 

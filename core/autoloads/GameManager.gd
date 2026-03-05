@@ -4,7 +4,7 @@ extends Node
 var game_data = {
 	"skin": "mage",
 	"token": "",
-	"difficulty": 2
+	"difficulty": 3
 }
 
 var mission_words: Array = [] 
@@ -118,6 +118,9 @@ func _handle_quiz_result_deferred(args):
 	
 	quiz_active = false
 	get_tree().paused = false 
+	
+	if OS.has_feature("web"):
+		JavaScriptBridge.eval("window.focus();")
 	
 	if success:
 		if player: player.gain_xp(300)
