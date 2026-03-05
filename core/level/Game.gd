@@ -10,6 +10,7 @@ extends Node2D
 
 var destructible_rock_scene = preload("res://entities/misc/DestructibleRock.tscn")
 var big_rock_scene = preload("res://entities/misc/BigRock.tscn")
+var pile_book_scene = preload("res://entities/misc/PileBook.tscn")
 var prop_timer: Timer
 
 var magic_material: ShaderMaterial
@@ -40,6 +41,36 @@ func generate_flowers(amount: int):
 		new_flower.show()
 		new_flower.position = Vector2(randf_range(0, area_size), randf_range(0, area_size))
 		parallax_layer.add_child(new_flower)
+
+func generate_scattered_props(textures: Array, amount: int, min_dist: float):
+	var area_x = parallax_layer.motion_mirroring.x
+	var area_y = parallax_layer.motion_mirroring.y
+	if area_x == 0: area_x = 2000
+	if area_y == 0: area_y = 2000
+	
+	var current_positions = []
+	
+	for i in range(amount):
+		var attempts = 0
+		var pos = Vector2.ZERO
+		var valid_pos = false
+		
+		while attempts < 50 and not valid_pos:
+			pos = Vector2(randf_range(0, area_x), randf_range(0, area_y))
+			valid_pos = true
+			for p in current_positions:
+				if pos.distance_to(p) < min_dist:
+					valid_pos = false
+					break
+			attempts += 1
+			
+		if valid_pos:
+			current_positions.append(pos)
+			var sprite = Sprite2D.new()
+			sprite.texture = textures[randi() % textures.size()]
+			sprite.position = pos
+			sprite.scale = Vector2(1.5, 1.5)
+			parallax_layer.add_child(sprite)
 
 func apply_difficulty_environment():
 	var difficulty = int(GameManager.game_data.get("difficulty", 2))	
@@ -86,32 +117,46 @@ func setup_hard_world():
 	clouds_layer.hide()
 	if player.has_node("AmbientParticles"):
 		player.get_node("AmbientParticles").emitting = false
+		
+	var props = [
+		preload("res://images/assets/scroll_1.png"),
+		preload("res://images/assets/scroll_2.png")
+	]
+	generate_scattered_props(props, 40, 150.0)
+	
+	prop_timer.start(2.5)
 
 func _process(delta):
 	if clouds_layer.visible:
 		clouds_layer.motion_offset += Vector2(15.0, 10.0) * delta
 
-# --- GENERADOR INFINITO DE ROCAS ---
+# --- GENERADOR INFINITO DE PROPS ---
 func _on_prop_spawn():
 	var difficulty = int(GameManager.game_data.get("difficulty", 2))
-	if difficulty != 2: 
-		return
+	if difficulty == 1: 
+		return # En modo fácil no hay obstáculos
 		
 	if not is_instance_valid(player):
 		return
 		
 	var player_pos = player.global_position
-	
 	var random_angle = randf() * TAU
 	var spawn_distance = randf_range(700.0, 900.0)
 	var spawn_pos = player_pos + Vector2(cos(random_angle), sin(random_angle)) * spawn_distance
 	
 	var prop_instance
-	if randf() < 0.8:
-		prop_instance = destructible_rock_scene.instantiate()
+	var r = randf()
+	
+	if difficulty >= 3:
+		# Mundo difícil: Libros 40%, Rocas 40%, Rocas Grandes 20%
+		prop_instance = pile_book_scene.instantiate()
+
 	else:
-		prop_instance = big_rock_scene.instantiate()
+		# Mundo normal: Solo rocas
+		if r < 0.8:
+			prop_instance = destructible_rock_scene.instantiate()
+		else:
+			prop_instance = big_rock_scene.instantiate()
 		
 	prop_instance.global_position = spawn_pos
-	
 	call_deferred("add_child", prop_instance)

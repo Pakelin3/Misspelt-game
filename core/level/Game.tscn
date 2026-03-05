@@ -42,6 +42,15 @@ texture = ExtResource("4_s0nni")
 region_enabled = true
 region_rect = Rect2(0, 0, 93, 32)
 
+[node name="Sprite2D" type="Sprite2D" parent="ParallaxBackground/CloudsLayer/Sprite2D" unique_id=823155897]
+modulate = Color(0, 0, 0, 0.28235295)
+texture_repeat = 2
+position = Vector2(421.07663, -16.891243)
+scale = Vector2(18.428463, 25.690384)
+texture = ExtResource("4_s0nni")
+region_enabled = true
+region_rect = Rect2(0, 0, 93, 32)
+
 [node name="Player" parent="." unique_id=1159769840 instance=ExtResource("1_ibkli")]
 top_level = true
 position = Vector2(466, 251)

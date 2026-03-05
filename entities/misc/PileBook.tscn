@@ -1,0 +1,20 @@
+[gd_scene format=3 uid="uid://b2647nhvn3nh5"]
+
+[ext_resource type="Script" uid="uid://bhmwfl1vdu4wg" path="res://entities/misc/BigRock.gd" id="1_0j211"]
+[ext_resource type="Texture2D" uid="uid://chpa8nv1wvbt3" path="res://images/assets/pile_book_1.png" id="2_0j211"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_4qf7h"]
+size = Vector2(53, 58)
+
+[node name="PileBook" type="StaticBody2D" unique_id=1883984123]
+collision_layer = 3
+collision_mask = 3
+script = ExtResource("1_0j211")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1947866965]
+scale = Vector2(0.5390625, 0.60156244)
+texture = ExtResource("2_0j211")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=200310011]
+position = Vector2(-0.5, 0)
+shape = SubResource("RectangleShape2D_4qf7h")
