@@ -4,7 +4,7 @@ extends Node
 var game_data = {
 	"skin": "mage",
 	"token": "",
-	"difficulty": 3
+	"difficulty": 1
 }
 
 var mission_words: Array = [] 
