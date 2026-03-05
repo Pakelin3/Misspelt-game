@@ -46,8 +46,18 @@ func apply_difficulty_environment():
 	elif difficulty >= 3:
 		setup_hard_world()
 
+func update_bg_tiling(new_texture: Texture, new_scale: Vector2, new_color: Color):
+	bg_grass.texture = new_texture
+	bg_grass.scale = new_scale
+	bg_grass.modulate = new_color
+	
+	var base_size = 2016 
+	bg_grass.region_rect = Rect2(0, 0, base_size, base_size)
+	
+	parallax_layer.motion_mirroring = Vector2(base_size * new_scale.x, base_size * new_scale.y)
+
 func setup_easy_world():
-	bg_grass.texture = preload("res://images/assets/grass.png")
+	update_bg_tiling(preload("res://images/assets/grass.png"), Vector2(1.0, 1.0), Color.WHITE)
 	clouds_layer.show()
 	generate_flowers(40)
 	
@@ -55,7 +65,7 @@ func setup_easy_world():
 		player.get_node("AmbientParticles").emitting = true
 
 func setup_normal_world():
-	bg_grass.texture = preload("res://images/assets/rocks.png")
+	update_bg_tiling(preload("res://images/assets/rocks.png"), Vector2(2, 2), Color(0.5, 0.5, 0.5))
 	
 	clouds_layer.hide()
 	if player.has_node("AmbientParticles"):

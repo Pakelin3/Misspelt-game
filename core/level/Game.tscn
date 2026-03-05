@@ -20,7 +20,7 @@ texture_repeat = 2
 position = Vector2(471, 269)
 texture = ExtResource("1_qbsmt")
 region_enabled = true
-region_rect = Rect2(0, 0, 2000, 2000)
+region_rect = Rect2(0, 0, 2016, 2016)
 
 [node name="Flower2" type="Sprite2D" parent="ParallaxBackground/ParallaxLayer" unique_id=1787790297]
 position = Vector2(149, 319)
@@ -45,3 +45,12 @@ region_rect = Rect2(0, 0, 93, 32)
 [node name="Player" parent="." unique_id=1159769840 instance=ExtResource("1_ibkli")]
 top_level = true
 position = Vector2(466, 251)
+speed = 300.0
+acceleration = 50.0
+friction = 20.0
+max_hp = 100
+level = 1
+current_xp = 0
+xp_required = 100
+attack_damage = 10
+additional_projectiles = 0
