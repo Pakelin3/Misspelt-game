@@ -123,6 +123,12 @@ func _handle_quiz_result_deferred(args):
 	
 	if OS.has_feature("web"):
 		JavaScriptBridge.eval("window.focus();")
+		JavaScriptBridge.eval("var c = document.getElementById('canvas'); if(c) { c.focus(); }")
+		JavaScriptBridge.eval(
+			"setTimeout(function() { " +
+			"window.focus(); var c = document.getElementById('canvas'); " +
+			"if(c) { c.focus(); } }, 200);"
+		)
 	
 	if success:
 		if player: player.gain_xp(300)
