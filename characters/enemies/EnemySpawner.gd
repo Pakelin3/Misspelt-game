@@ -9,8 +9,6 @@ var gem_scene = preload("res://entities/items/XPGem.tscn")
 
 var difficulty_level: int = 1
 var time_since_start: float = 0.0
-
-# --- NUESTRAS PISCINAS ---
 var enemy_pool: Array = []
 var letter_pool: Array = []
 var gem_pool: Array = []

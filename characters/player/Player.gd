@@ -361,11 +361,11 @@ func clean_floor_letters():
 
 func die():
 	var sfx = AudioStreamPlayer.new()
+	MusicManager.pause_music()
 	sfx.stream = preload("res://music/game_over.mp3")
 	sfx.process_mode = Node.PROCESS_MODE_ALWAYS
 	add_child(sfx)
 	sfx.play()
-
 	get_tree().paused = true
 	set_physics_process(false)
 	weapon_pivot.set_physics_process(false)
