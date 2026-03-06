@@ -2,15 +2,17 @@ extends Node
 
 # --- DATOS DE SESIÓN ---
 var game_data = {
-	"skin": "mage",
+	"skin": "farmer",
 	"token": "",
-	"difficulty": 1
+	"difficulty": 3
 }
 
 var mission_words: Array = [] 
 var current_word_index: int = 0
 var target_word: String = "LOADING" 
 var found_letters: Array = []
+var letters_killed: int = 0
+var bosses_killed: int = 0
 var _js_window
 
 # --- REFERENCIA CRÍTICA PARA WEB ---
@@ -101,7 +103,7 @@ func send_game_over_to_web(final_xp: int, time_spent: int):
 	print("GameManager: Enviando Game Over a React. XP:", final_xp, " Tiempo:", time_spent)
 	if OS.has_feature("web") and _js_window:
 		if _js_window.handleGameOver:
-			_js_window.handleGameOver(final_xp, time_spent)
+			_js_window.handleGameOver(final_xp, time_spent, letters_killed, bosses_killed)
 	else:
 		print("GameManager (Editor): Game Over simulado.")
 
@@ -182,6 +184,6 @@ func game_win():
 			final_time = int(player.time_elapsed)
 		
 		if _js_window.handleGameOver:
-			_js_window.handleGameOver(final_xp, final_time)
+			_js_window.handleGameOver(final_xp, final_time, letters_killed, bosses_killed)
 	else:
 		print("Ganaste (Editor)")

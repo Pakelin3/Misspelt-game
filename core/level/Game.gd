@@ -11,8 +11,10 @@ extends Node2D
 var destructible_rock_scene = preload("res://entities/misc/DestructibleRock.tscn")
 var big_rock_scene = preload("res://entities/misc/BigRock.tscn")
 var pile_book_scene = preload("res://entities/misc/PileBook.tscn")
+var magic_pilar_scene = preload("res://entities/misc/MagicPilar.tscn")
 var prop_timer: Timer
 
+var scattered_scroll_positions: Array[Vector2] = []
 var magic_material: ShaderMaterial
 
 func _ready():
@@ -48,6 +50,7 @@ func generate_scattered_props(textures: Array, amount: int, min_dist: float):
 	if area_x == 0: area_x = 2000
 	if area_y == 0: area_y = 2000
 	
+	scattered_scroll_positions.clear()
 	var current_positions = []
 	
 	for i in range(amount):
@@ -66,6 +69,7 @@ func generate_scattered_props(textures: Array, amount: int, min_dist: float):
 			
 		if valid_pos:
 			current_positions.append(pos)
+			scattered_scroll_positions.append(pos)
 			var sprite = Sprite2D.new()
 			sprite.texture = textures[randi() % textures.size()]
 			sprite.position = pos
@@ -134,23 +138,62 @@ func _process(delta):
 func _on_prop_spawn():
 	var difficulty = int(GameManager.game_data.get("difficulty", 2))
 	if difficulty == 1: 
-		return # En modo fácil no hay obstáculos
+		return 
 		
 	if not is_instance_valid(player):
 		return
 		
 	var player_pos = player.global_position
-	var random_angle = randf() * TAU
-	var spawn_distance = randf_range(700.0, 900.0)
-	var spawn_pos = player_pos + Vector2(cos(random_angle), sin(random_angle)) * spawn_distance
+	
+	var valid_spawn = false
+	var spawn_pos = Vector2.ZERO
+	var attempts = 0
+	
+	var area_x = parallax_layer.motion_mirroring.x
+	var area_y = parallax_layer.motion_mirroring.y
+	if area_x == 0: area_x = 2000
+	if area_y == 0: area_y = 2000
+	
+	while attempts < 15 and not valid_spawn:
+		attempts += 1
+		var random_angle = randf() * TAU
+		var spawn_distance = randf_range(700.0, 900.0)
+		spawn_pos = player_pos + Vector2(cos(random_angle), sin(random_angle)) * spawn_distance
+		
+		valid_spawn = true
+		
+		if difficulty >= 3:
+			var local_spawn_x = fmod(spawn_pos.x, area_x)
+			if local_spawn_x < 0: local_spawn_x += area_x
+			var local_spawn_y = fmod(spawn_pos.y, area_y)
+			if local_spawn_y < 0: local_spawn_y += area_y
+			var local_spawn_pos = Vector2(local_spawn_x, local_spawn_y)
+			
+			for s_pos in scattered_scroll_positions:
+				if local_spawn_pos.distance_to(s_pos) < 200.0:
+					valid_spawn = false
+					break
+		
+		if not valid_spawn:
+			continue
+		for child in get_children():
+			if child is StaticBody2D:
+				if child.global_position.distance_to(spawn_pos) < 200.0:
+					valid_spawn = false
+					break
+					
+	if not valid_spawn:
+		return
 	
 	var prop_instance
 	var r = randf()
 	
 	if difficulty >= 3:
-		# Mundo difícil: Libros 40%, Rocas 40%, Rocas Grandes 20%
-		prop_instance = pile_book_scene.instantiate()
-
+		# Mundo difícil: MagicPilar 40%, PileBook 60%
+		if r < 0.4:
+			prop_instance = magic_pilar_scene.instantiate()
+		elif r < 1.0:
+			prop_instance = pile_book_scene.instantiate()
 	else:
 		# Mundo normal: Solo rocas
 		if r < 0.8:

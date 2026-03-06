@@ -1,0 +1,63 @@
+[gd_scene format=3 uid="uid://dhqycwu7bos26"]
+
+[ext_resource type="Script" uid="uid://bhmwfl1vdu4wg" path="res://entities/misc/BigRock.gd" id="1_s8swc"]
+[ext_resource type="Texture2D" uid="uid://clktanrx15yr5" path="res://images/assets/magic_pilar.png" id="2_s8swc"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_4qf7h"]
+size = Vector2(35, 93)
+
+[sub_resource type="Animation" id="Animation_s8swc"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [0]
+}
+
+[sub_resource type="Animation" id="Animation_sry35"]
+resource_name = "idle"
+length = 2.0
+loop_mode = 1
+step = 0.1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Sprite2D:frame")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.90000004, 1, 1.1, 1.2, 1.3000001, 1.4, 1.5, 1.6, 1.7, 1.8000001, 1.9),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 18]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_h0ks1"]
+_data = {
+&"RESET": SubResource("Animation_s8swc"),
+&"idle": SubResource("Animation_sry35")
+}
+
+[node name="MagicPilar" type="StaticBody2D" unique_id=1883984123]
+collision_layer = 3
+collision_mask = 3
+script = ExtResource("1_s8swc")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1947866965]
+scale = Vector2(1.75, 1.75)
+texture = ExtResource("2_s8swc")
+hframes = 19
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=200310011]
+shape = SubResource("RectangleShape2D_4qf7h")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=205082155]
+libraries/ = SubResource("AnimationLibrary_h0ks1")
+autoplay = &"idle"

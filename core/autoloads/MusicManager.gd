@@ -28,6 +28,11 @@ func _ready():
 	EventBus.spawn_punishment_boss.connect(_on_boss_spawned)
 	EventBus.boss_enye_died.connect(_on_boss_died)
 	
+	if not level_player.finished.is_connected(level_player.play):
+		level_player.finished.connect(level_player.play)
+	if not boss_player.finished.is_connected(boss_player.play):
+		boss_player.finished.connect(boss_player.play)
+	
 	call_deferred("_start_level_music")
 
 func _start_level_music():

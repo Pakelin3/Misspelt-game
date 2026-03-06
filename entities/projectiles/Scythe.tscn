@@ -1,0 +1,24 @@
+[gd_scene format=3 uid="uid://lldnie7egw5g"]
+
+[ext_resource type="Script" uid="uid://bouleuq0pl35k" path="res://entities/projectiles/Scythe.gd" id="1_dprbf"]
+[ext_resource type="Texture2D" uid="uid://bcbn504v1ypb3" path="res://images/attacks/scythe.png" id="2_in4cg"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_kdm4f"]
+size = Vector2(27, 12)
+
+[node name="Projectile" type="Area2D" unique_id=133669646]
+collision_layer = 0
+collision_mask = 2
+script = ExtResource("1_dprbf")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1215589331]
+rotation = 1.5707964
+scale = Vector2(1.5, 1.5)
+texture = ExtResource("2_in4cg")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=2050624674]
+position = Vector2(3.5, 0)
+shape = SubResource("RectangleShape2D_kdm4f")
+
+[node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="." unique_id=1380059]
+rect = Rect2(-10, -7, 27, 14)

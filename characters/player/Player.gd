@@ -43,6 +43,10 @@ var erudit_current_angle: float = 0.0
 var active_books: Array = []
 var erudit_hit_cooldowns: Dictionary = {}
 
+# --- VARIABLES DEL CAMPESINO ---
+var farmer_scythe_level: int = 0
+var farmer_scythe_pierce: int = 0
+
 func _ready():
 	randomize()
 	var my_skin = GameManager.game_data["skin"]
@@ -84,10 +88,21 @@ func setup_skin(skin_id: String):
 		erudit_book.set_deferred("monitoring", true) 
 		setup_erudit_books()
 		
+	elif skin_id == "farmer":
+		warlock_aura.hide()
+		aura_tick_timer.stop()
+		weapon_pivot.show()
+		weapon_pivot.set_projectile("res://entities/projectiles/Scythe.tscn")
+		shoot_timer.start()
+		if erudit_book:
+			erudit_book.hide()
+			erudit_book.set_deferred("monitoring", false)
+		
 	else:
 		warlock_aura.hide()
 		aura_tick_timer.stop()
 		weapon_pivot.show()
+		weapon_pivot.set_projectile("res://entities/projectiles/Projectile.tscn")
 		shoot_timer.start()
 		if erudit_book:
 			erudit_book.hide()
@@ -242,6 +257,17 @@ func level_up():
 			data_c2 = { "title": "MÁS CONOCIMIENTO", "desc": "Añade un libro a tu órbita.", "stats": "+1 LIBRO" }
 		else:
 			data_c2 = { "title": "LECTURA RÁPIDA", "desc": "Tus libros giran más rápido.", "stats": "+ VELOCIDAD" }
+	elif my_skin == "farmer":
+		if farmer_scythe_level == 0:
+			data_c2 = { "title": "GUADAÑA AFILADA", "desc": "Atraviesa 1 enemigo antes de volver.", "stats": "+1 PERFORACIÓN" }
+		elif farmer_scythe_level == 1:
+			data_c2 = { "title": "DOBLE CORTE", "desc": "Atraviesa 2 enemigos antes de volver.", "stats": "+2 PERFORACIÓN" }
+		elif farmer_scythe_level == 2:
+			data_c2 = { "title": "COSECHA MAGNA", "desc": "Atraviesa 3 enemigos antes de volver.", "stats": "+3 PERFORACIÓN" }
+		elif farmer_scythe_level == 3:
+			data_c2 = { "title": "SEGAR ALMAS", "desc": "Atraviesa enemigos ilimitadamente.", "stats": "PIERCE ∞" }
+		else:
+			data_c2 = { "title": "DOBLE GUADAÑA", "desc": "Lanza guadañas adicionales.", "stats": "+1 GUADAÑA" }
 	else:
 		if additional_projectiles < 3:
 			var total_bolas = additional_projectiles + 2 
@@ -275,6 +301,21 @@ func apply_upgrade(choice: int):
 				add_new_book() 
 			else:
 				erudit_orbit_speed += 1.5 
+		elif my_skin == "farmer":
+			if farmer_scythe_level == 0:
+				farmer_scythe_pierce = 1
+				farmer_scythe_level = 1
+			elif farmer_scythe_level == 1:
+				farmer_scythe_pierce = 2
+				farmer_scythe_level = 2
+			elif farmer_scythe_level == 2:
+				farmer_scythe_pierce = 3
+				farmer_scythe_level = 3
+			elif farmer_scythe_level == 3:
+				farmer_scythe_pierce = -1 
+				farmer_scythe_level = 4
+			else:
+				additional_projectiles += 1
 		else:
 			if additional_projectiles < 3: additional_projectiles += 1
 			else: attack_damage += 15
@@ -329,6 +370,7 @@ func die():
 	set_physics_process(false)
 	weapon_pivot.set_physics_process(false)
 	shoot_timer.stop()
+	await sfx.finished
 	EventBus.player_died.emit(total_xp_earned, int(time_elapsed))
 
 func _on_game_timer_timeout():
@@ -342,6 +384,9 @@ func _on_aura_tick_timer_timeout() -> void:
 	for body in enemies_in_aura:
 		if body.has_method("take_damage") and not body.is_in_group("player"):
 			body.take_damage(attack_damage)
+			if body.has_method("apply_knockback"):
+				var push_dir = global_position.direction_to(body.global_position)
+				body.apply_knockback(push_dir, 300.0)
 
 func _on_button_pressed() -> void:
 	get_tree().paused = false 

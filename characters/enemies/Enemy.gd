@@ -12,6 +12,7 @@ var hp: int = 20
 var player: Node2D = null
 var my_char: String = "" 
 var is_active: bool = true
+var knockback_velocity: Vector2 = Vector2.ZERO
 
 func _ready():
 	var players = get_tree().get_nodes_in_group("player")
@@ -23,8 +24,9 @@ func _physics_process(_delta):
 	
 	if player:
 		var direction = global_position.direction_to(player.global_position)
-		velocity = direction * speed
+		velocity = (direction * speed) + knockback_velocity
 		move_and_slide()
+		knockback_velocity = knockback_velocity.move_toward(Vector2.ZERO, 1500 * _delta)
 		
 		for body in $Hitbox.get_overlapping_bodies():
 			if body.is_in_group("player"):
@@ -34,7 +36,13 @@ func _physics_process(_delta):
 				velocity = push_direction * (speed * 5) 
 				move_and_slide()
 	else:
-		velocity = Vector2.ZERO
+		velocity = knockback_velocity
+		knockback_velocity = knockback_velocity.move_toward(Vector2.ZERO, 1500 * _delta)
+		move_and_slide()
+
+func apply_knockback(push_dir: Vector2, strength: float):
+	if not is_active: return
+	knockback_velocity = push_dir * strength
 
 func take_damage(amount: int):
 	if not is_active: return 
@@ -51,6 +59,7 @@ func die():
 	if not is_active: return 
 	is_active = false 
 	print("Enemigo derrotado")
+	GameManager.letters_killed += 1
 	emit_signal("enemy_died", global_position, my_char)
 	
 	var sfx = AudioStreamPlayer2D.new()

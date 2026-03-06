@@ -5,6 +5,13 @@ var projectile_scene = preload("res://entities/projectiles/Projectile.tscn")
 
 var projectile_pool: Array = []
 
+func set_projectile(scene_path: String):
+	projectile_scene = load(scene_path)
+	for proj in projectile_pool:
+		if is_instance_valid(proj):
+			proj.queue_free()
+	projectile_pool.clear()
+
 func _physics_process(_delta):
 	var enemies = get_tree().get_nodes_in_group("enemy")
 	var nearest_enemy = null
@@ -37,10 +44,15 @@ func shoot():
 	var spread_angle = deg_to_rad(15.0)
 	var start_rotation = rotation - (spread_angle * (total_shots - 1) / 2.0)
 	
+	var pierce = player.farmer_scythe_pierce if "farmer_scythe_pierce" in player else 0
+	
 	for i in range(total_shots):
 		var proj = get_projectile() 
 		
 		var proj_rotation = start_rotation + (i * spread_angle)
 		var dir = Vector2.RIGHT.rotated(proj_rotation)
 		
-		proj.activate(shooting_point.global_position, proj_rotation, dir, base_damage)
+		if proj.has_method("activate") and proj.get_method_argument_count("activate") > 4:
+			proj.activate(shooting_point.global_position, proj_rotation, dir, base_damage, player, pierce)
+		else:
+			proj.activate(shooting_point.global_position, proj_rotation, dir, base_damage)

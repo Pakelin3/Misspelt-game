@@ -8,4 +8,4 @@ max_hp = 120
 attack_damage = 8
 speed = 300.0
 acceleration = 50.0
-additional_projectiles = 1
+additional_projectiles = 0

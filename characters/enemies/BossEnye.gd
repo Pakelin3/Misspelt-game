@@ -8,6 +8,7 @@ extends CharacterBody2D
 var current_hp: int = max_hp
 var player: Node2D = null
 var is_active: bool = true
+var knockback_velocity: Vector2 = Vector2.ZERO
 
 # --- MÁQUINA DE ESTADOS ---
 enum State { FOLLOW, DASH, COOLDOWN }
@@ -30,7 +31,7 @@ func _physics_process(delta):
 	match current_state:
 		State.FOLLOW:
 			var direction = global_position.direction_to(player.global_position)
-			velocity = direction * base_speed
+			velocity = (direction * base_speed) + knockback_velocity
 			
 			if state_timer <= 0:
 				start_dash()
@@ -43,11 +44,12 @@ func _physics_process(delta):
 				state_timer = 1.0 
 
 		State.COOLDOWN:
-			velocity = velocity.move_toward(Vector2.ZERO, 1000 * delta) 
+			velocity = velocity.move_toward(Vector2.ZERO, 1000 * delta) + knockback_velocity
 			if state_timer <= 0:
 				current_state = State.FOLLOW
 				state_timer = randf_range(2.0, 4.0)
 
+	knockback_velocity = knockback_velocity.move_toward(Vector2.ZERO, 1500 * delta)
 	move_and_slide()
 
 	if has_node("Hitbox"):
@@ -70,6 +72,10 @@ func shoot_tilde():
 	tilde.boss_ref = self
 	get_tree().current_scene.add_child(tilde)
 
+func apply_knockback(push_dir: Vector2, strength: float):
+	if not is_active: return
+	knockback_velocity = push_dir * (strength * 0.5)
+
 func take_damage(amount: int):
 	if not is_active: return
 	current_hp -= amount
@@ -84,6 +90,7 @@ func take_damage(amount: int):
 func die():
 	is_active = false
 	print("¡La Ñ ha sido domada!")
+	GameManager.bosses_killed += 1
 	var drop = preload("res://entities/items/XPGem.tscn").instantiate()
 	drop.xp_value = 150
 	drop.global_position = global_position
