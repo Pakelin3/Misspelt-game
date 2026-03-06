@@ -56,6 +56,9 @@ func _physics_process(delta):
 		for body in $Hitbox.get_overlapping_bodies():
 			if body.is_in_group("player") and body.has_method("take_damage"):
 				body.take_damage(damage)
+			elif body.is_in_group("enemy") and body != self:
+				if body.has_method("die_by_boss"):
+					body.die_by_boss()
 
 func start_dash():
 	current_state = State.DASH
