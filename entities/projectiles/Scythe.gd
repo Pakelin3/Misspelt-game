@@ -60,7 +60,12 @@ func _on_body_entered(body):
 			return 
 			
 		if body.has_method("take_damage"):
-			body.take_damage(damage)
+			var final_damage = damage
+			if is_instance_valid(player_ref) and "farmer_scythe_crit_chance" in player_ref:
+				if randf() < player_ref.farmer_scythe_crit_chance:
+					final_damage *= 2
+			
+			body.take_damage(final_damage)
 			hit_enemies.append(body)
 			
 		if not is_returning:
