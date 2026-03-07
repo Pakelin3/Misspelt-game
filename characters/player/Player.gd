@@ -85,7 +85,7 @@ func setup_skin(skin_id: String):
 	var resource_path = "res://characters/player/" + skin_id + "_stats.tres"
 	var stats: Resource = load(resource_path)
 	if not stats:
-		stats = load("res://characters/player/mage_stats.tres") # Fallback
+		stats = load("res://characters/player/mage_stats.tres")
 		
 	if skin_id == "warlock":
 		weapon_pivot.hide()
@@ -93,7 +93,7 @@ func setup_skin(skin_id: String):
 		warlock_aura.show()
 		aura_tick_timer.start() 
 		erudit_book.hide()
-		erudit_book.set_deferred("monitoring", false) # <--- APAGAR COLISIÓN
+		erudit_book.set_deferred("monitoring", false)
 		
 	elif skin_id == "erudit":
 		warlock_aura.hide()
@@ -122,7 +122,7 @@ func setup_skin(skin_id: String):
 		shoot_timer.start()
 		if erudit_book:
 			erudit_book.hide()
-			erudit_book.set_deferred("monitoring", false)# <--- APAGAR COLISIÓN
+			erudit_book.set_deferred("monitoring", false)
 		
 	max_hp = stats.max_hp
 	current_hp = max_hp
