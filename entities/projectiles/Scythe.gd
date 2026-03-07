@@ -91,6 +91,12 @@ func activate(spawn_pos: Vector2, spawn_rot: float, new_dir: Vector2, dmg: int, 
 	is_returning = false
 	hit_enemies.clear()
 	
+	if player_ref and "farmer_scythe_size_multiplier" in player_ref:
+		var s = player_ref.farmer_scythe_size_multiplier
+		scale = Vector2(s, s)
+	else:
+		scale = Vector2.ONE
+	
 	is_active = true
 	show() 
 	set_deferred("monitoring", true)

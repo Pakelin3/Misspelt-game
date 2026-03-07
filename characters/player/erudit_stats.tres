@@ -4,8 +4,8 @@
 
 [resource]
 script = ExtResource("1_erudit")
-max_hp = 115
-attack_damage = 15
-speed = 314.1
+max_hp = 80
+attack_damage = 12
+speed = 320.0
 acceleration = 60.0
 additional_projectiles = 0

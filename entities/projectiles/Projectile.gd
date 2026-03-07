@@ -5,6 +5,9 @@ extends Area2D
 
 var direction: Vector2 = Vector2.RIGHT
 var is_active: bool = true
+var max_pierce: int = 0
+var current_pierce: int = 0
+var hit_enemies: Array = []
 
 func _ready():
 	$VisibleOnScreenNotifier2D.screen_exited.connect(deactivate)
@@ -23,9 +26,17 @@ func _on_body_entered(body):
 			body.take_damage(damage)
 		call_deferred("deactivate")
 		return
-	if body.has_method("take_damage"):
-		body.take_damage(damage)
-		call_deferred("deactivate")
+	if body.is_in_group("enemy"):
+		if body in hit_enemies:
+			return
+		
+		if body.has_method("take_damage"):
+			body.take_damage(damage)
+			hit_enemies.append(body)
+		
+		current_pierce += 1
+		if current_pierce > max_pierce:
+			call_deferred("deactivate")
 
 # --- FUNCIONES DEL OBJECT POOLING ---
 
@@ -35,11 +46,14 @@ func deactivate():
 	set_deferred("monitoring", false)
 	set_deferred("monitorable", false)
 
-func activate(spawn_pos: Vector2, spawn_rot: float, new_dir: Vector2, dmg: int):
+func activate(spawn_pos: Vector2, spawn_rot: float, new_dir: Vector2, dmg: int, player: Node2D = null, pierce: int = 0):
 	global_position = spawn_pos
 	rotation = spawn_rot
 	direction = new_dir
 	damage = dmg
+	max_pierce = pierce
+	current_pierce = 0
+	hit_enemies.clear()
 	
 	is_active = true
 	show() 

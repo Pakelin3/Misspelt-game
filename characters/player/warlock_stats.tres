@@ -5,7 +5,7 @@
 [resource]
 script = ExtResource("1_warlock")
 max_hp = 20
-attack_damage = 12
-speed = 200.0
-acceleration = 40.0
+attack_damage = 18
+speed = 380.0
+acceleration = 70.0
 additional_projectiles = 0

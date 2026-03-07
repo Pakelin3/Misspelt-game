@@ -4,8 +4,8 @@
 
 [resource]
 script = ExtResource("1_farmer")
-max_hp = 120
-attack_damage = 8
-speed = 314.1
-acceleration = 50.0
+max_hp = 150
+attack_damage = 15
+speed = 280.0
+acceleration = 40.0
 additional_projectiles = 0

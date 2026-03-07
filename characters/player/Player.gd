@@ -6,6 +6,10 @@ extends CharacterBody2D
 @onready var weapon_pivot = $WeaponPivot
 @onready var hud = $HUD
 
+var warlock_soul_reaper: bool = false
+var mage_pierce: int = 0
+var farmer_scythe_size_multiplier: float = 1.0
+
 # --- ATAQUE DE CLASES/SKINS ---
 @onready var warlock_aura = $WarlockAura
 @onready var aura_tick_timer = $WarlockAura/AuraTickTimer
@@ -22,6 +26,7 @@ extends CharacterBody2D
 @export var max_hp: int = 100
 var current_hp: int = 100
 var is_invincible: bool = false
+var heal_cooldown: float = 0.0
 
 @export_group("RPG Stats")
 @export var level: int = 1
@@ -31,15 +36,26 @@ var total_xp_earned: int = 0
 
 @export_group("Combat Stats")
 @export var attack_damage: int = 10
+var damage_multiplier: float = 1.0
+
 @export var additional_projectiles: int = 0
 var card1_choice: String = ""
 var time_elapsed: int = 0
+
+# --- NUEVOS MODIFICADORES GLOBALES ---
+var move_speed_multiplier: float = 1.0
+var attack_speed_multiplier: float = 1.0
+var damage_reduction: int = 0
+var xp_pickup_multiplier: float = 1.0
+
+var card3_choice: String = ""
 
 # --- VARIABLES DEL ERUDITO ---
 var erudit_book_count: int = 1
 var erudit_orbit_speed: float = 3.0
 var erudit_orbit_radius: float = 160.0
 var erudit_current_angle: float = 0.0
+var erudit_knockback_multiplier: float = 1.0
 var active_books: Array = []
 var erudit_hit_cooldowns: Dictionary = {}
 
@@ -122,6 +138,9 @@ func _physics_process(delta):
 	if GameManager.game_data["skin"] == "erudit":
 		update_erudit_orbit(delta)
 	
+	if heal_cooldown > 0:
+		heal_cooldown -= delta
+	
 func update_erudit_orbit(delta):
 	erudit_current_angle += erudit_orbit_speed * delta
 	if erudit_current_angle >= TAU: 
@@ -144,7 +163,10 @@ func check_book_damage(book: Area2D):
 	for body in book.get_overlapping_bodies():
 		if (body.is_in_group("enemy") or body.is_in_group("obstacle")) and body.has_method("take_damage"):
 			if not erudit_hit_cooldowns.has(body):
-				body.take_damage(attack_damage)
+				body.take_damage(int(attack_damage * damage_multiplier))
+				if body.has_method("apply_knockback"):
+					var push_dir = global_position.direction_to(body.global_position)
+					body.apply_knockback(push_dir, 300.0 * erudit_knockback_multiplier)
 				erudit_hit_cooldowns[body] = 0.5
 
 func update_erudit_cooldowns(delta: float):
@@ -192,8 +214,9 @@ func add_new_book():
 
 func move_state():
 	var input_vector = Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
+	var current_speed = speed * move_speed_multiplier
 	if input_vector != Vector2.ZERO:
-		velocity = velocity.move_toward(input_vector * speed, acceleration)
+		velocity = velocity.move_toward(input_vector * current_speed, acceleration)
 	else:
 		velocity = velocity.move_toward(Vector2.ZERO, friction)
 
@@ -202,7 +225,8 @@ func move_state():
 func take_damage(amount: int):
 	if is_invincible or current_hp <= 0: return
 	
-	current_hp -= amount
+	var actual_damage = max(1, amount - damage_reduction)
+	current_hp -= actual_damage
 	hud.update_hp(current_hp)
 	
 	if current_hp <= 0:
@@ -232,96 +256,143 @@ func level_up():
 	get_tree().paused = true
 	MusicManager.lower_volume()
 	
-	var rand_stat = randi() % 3
+	# Opciones Generales (Carta 1)
+	var pool_c1 = [
+		{"id": "flat_dmg", "title": "FUERZA BRUTA", "desc": "Tus hechizos golpean más fuerte.", "stats": "+5 DAÑO"},
+		{"id": "perc_dmg", "title": "PODER ARCANO", "desc": "Aumenta el daño total.", "stats": "+15% DAÑO"},
+		{"id": "flat_spd", "title": "PIES LIGEROS", "desc": "Te mueves más rápido por el mapa.", "stats": "+30 VELOCIDAD"},
+		{"id": "perc_spd", "title": "REFLEJOS", "desc": "Aumenta tu velocidad total.", "stats": "+10% VEL."},
+		{"id": "atk_spd", "title": "METRALLETA", "desc": "Reduce el tiempo entre disparos.", "stats": "-15% RECARGA"},
+		{"id": "armor", "title": "PIEL DE HIERRO", "desc": "Reduce el daño recibido.", "stats": "BLOQUEA 1 DAÑO"},
+	]
 	
-	# Estructura de datos para la Carta 1
-	var data_c1 = {}
-	if rand_stat == 0:
-		card1_choice = "damage"
-		data_c1 = { "title": "FUERZA BRUTA", "desc": "Tus hechizos golpean más fuerte.", "stats": "+5 DAÑO" }
-	elif rand_stat == 1:
-		card1_choice = "speed"
-		data_c1 = { "title": "PIES LIGEROS", "desc": "Te mueves más rápido por el mapa.", "stats": "+40 VELOCIDAD" }
-	else:
-		card1_choice = "attack_speed"
-		data_c1 = { "title": "METRALLETA", "desc": "Reduce el tiempo entre disparos.", "stats": "-0.1s RECARGA" }
+	pool_c1.shuffle()
+	var choice1 = pool_c1[0]
+	card1_choice = choice1["id"]
+	var data_c1 = {"title": choice1["title"], "desc": choice1["desc"], "stats": choice1["stats"]}
 		
 	var my_skin = GameManager.game_data["skin"]
 	
 	# Estructura de datos para la Carta 2
 	var data_c2 = {}
 	if my_skin == "warlock":
-		data_c2 = { "title": "CORRUPCIÓN", "desc": "Tu aura oscura se expande.", "stats": "+15% RANGO" }
+		if warlock_aura.scale.x < 3.0: 
+			data_c2 = { "title": "CORRUPCIÓN", "desc": "Tu aura oscura se expande.", "stats": "+15% RANGO" }
+		elif aura_tick_timer.wait_time > 0.2:
+			data_c2 = { "title": "VACÍO FAMÉLICO", "desc": "El aura ataca más rápido.", "stats": "-20% TICK" }
+		else:
+			data_c2 = { "title": "SEGADOR DE ALMAS", "desc": "Matar con el aura te cura.", "stats": "CURACIÓN" }
+			
 	elif my_skin == "erudit":
 		if erudit_book_count < 6:
 			data_c2 = { "title": "MÁS CONOCIMIENTO", "desc": "Añade un libro a tu órbita.", "stats": "+1 LIBRO" }
+		elif erudit_orbit_speed < 8.0:
+			data_c2 = { "title": "LECTURA RÁPIDA", "desc": "Tus libros giran más rápido.", "stats": "+30% VELOCIDAD" }
 		else:
-			data_c2 = { "title": "LECTURA RÁPIDA", "desc": "Tus libros giran más rápido.", "stats": "+ VELOCIDAD" }
+			data_c2 = { "title": "LIBROS PESADOS", "desc": "Los libros empujan más fuerte.", "stats": "+50% KNOCKBACK" }
 	elif my_skin == "farmer":
 		if farmer_scythe_level == 0:
 			data_c2 = { "title": "GUADAÑA AFILADA", "desc": "Atraviesa 1 enemigo antes de volver.", "stats": "+1 PERFORACIÓN" }
 		elif farmer_scythe_level == 1:
-			data_c2 = { "title": "DOBLE CORTE", "desc": "Atraviesa 2 enemigos antes de volver.", "stats": "+2 PERFORACIÓN" }
+			data_c2 = { "title": "COSECHA MAGNA", "desc": "Las guadañas son más grandes.", "stats": "+30% TAMAÑO" }
 		elif farmer_scythe_level == 2:
-			data_c2 = { "title": "COSECHA MAGNA", "desc": "Atraviesa 3 enemigos antes de volver.", "stats": "+3 PERFORACIÓN" }
+			data_c2 = { "title": "DOBLE GUADAÑA", "desc": "Lanza dos guadañas.", "stats": "+1 GUADAÑA" }
 		elif farmer_scythe_level == 3:
-			data_c2 = { "title": "SEGAR ALMAS", "desc": "Atraviesa enemigos ilimitadamente.", "stats": "PIERCE ∞" }
+			data_c2 = { "title": "SEGAR ALMAS", "desc": "Atraviesan infinitamente.", "stats": "PIERCE ∞" }
 		else:
-			data_c2 = { "title": "DOBLE GUADAÑA", "desc": "Lanza guadañas adicionales.", "stats": "+1 GUADAÑA" }
+			data_c2 = { "title": "COSECHA CRÍTICA", "desc": "Aún no implementado.", "stats": "+15% DAÑO CRIT" }
 	else:
 		if additional_projectiles < 3:
 			var total_bolas = additional_projectiles + 2 
 			data_c2 = { "title": "MULTICAST", "desc": "Añade un proyectil adicional.", "stats": str(total_bolas) + " BOLAS" }
+		elif additional_projectiles == 3:
+			data_c2 = { "title": "DISPARO PERFORANTE", "desc": "Los proyectiles atraviesan enemigos.", "stats": "+1 PIERCE" }
 		else:
-			data_c2 = { "title": "ARCHIMAGO", "desc": "Concentración de poder puro.", "stats": "+15 DAÑO" }
+			data_c2 = { "title": "ARCHIMAGO", "desc": "Concentración de poder puro.", "stats": "+20% DAÑO TOTAL" }
 
-	# Estructura de datos para la Carta 3 (Curación)
-	var data_c3 = { 
-		"title": "DESCANSO", 
-		"desc": "Recuperas salud y aumentas tu vitalidad.", 
-		"stats": "+20 HP MÁX" 
-	}
+	# Opciones de Supervivencia (Carta 3)
+	var pool_c3 = [
+		{"id": "rest", "title": "DESCANSO", "desc": "Recuperas salud y aumentas tu vitalidad.", "stats": "CURA 50%, +10 HP"},
+		{"id": "regen", "title": "REGENERACIÓN", "desc": "Recuperas salud poco a poco.", "stats": "1 HP / 5s"}
+	]
+	
+	pool_c3.shuffle()
+	var choice3 = pool_c3[0]
+	card3_choice = choice3["id"]
+	var data_c3 = {"title": choice3["title"], "desc": choice3["desc"], "stats": choice3["stats"]}
 	
 	hud.show_level_up_panel(data_c1, data_c2, data_c3)
 
 func apply_upgrade(choice: int):
+	# Aplicar Mejoras Generales (Carta 1)
 	if choice == 1:
-		if card1_choice == "damage": attack_damage += 5
-		elif card1_choice == "speed": speed += 40
-		elif card1_choice == "attack_speed":
-			if shoot_timer.wait_time > 0.15: shoot_timer.wait_time -= 0.1
+		if card1_choice == "flat_dmg": attack_damage += 5
+		elif card1_choice == "perc_dmg": damage_multiplier += 0.15
+		elif card1_choice == "flat_spd": speed += 30
+		elif card1_choice == "perc_spd": move_speed_multiplier += 0.10
+		elif card1_choice == "atk_spd": 
+			attack_speed_multiplier -= 0.15
+			# Limitar la reducción máxima de velocidad de ataque (ej. 60% más rápido máx)
+			if attack_speed_multiplier < 0.4: attack_speed_multiplier = 0.4
+			# Aplicar al timer actual
+			# El _ready ya asocia el timer original de shoot_timer pero lo ajustamos en base al base * multiplier
+			# Nota: Si se cambia el arma se debe re-ajustar.
+			shoot_timer.wait_time = max(0.1, shoot_timer.wait_time * 0.85)
+		elif card1_choice == "armor": damage_reduction += 1
+		
+	# Aplicar Mejoras de Clase (Carta 2) - TODO en su mayor parte
 	elif choice == 2:
 		var my_skin = GameManager.game_data["skin"]
 		if my_skin == "warlock":
-			warlock_aura.scale *= 1.15 
-			attack_damage += 2
+			if warlock_aura.scale.x < 3.0:
+				warlock_aura.scale *= 1.15 
+			elif aura_tick_timer.wait_time > 0.2:
+				aura_tick_timer.wait_time *= 0.8
+			else:
+				warlock_soul_reaper = true
 		elif my_skin == "erudit":
 			if erudit_book_count < 6:
 				erudit_book_count += 1
 				add_new_book() 
+			elif erudit_orbit_speed < 8.0:
+				erudit_orbit_speed *= 1.3 
 			else:
-				erudit_orbit_speed += 1.5 
+				erudit_knockback_multiplier = 1.5
+				damage_multiplier += 0.10
 		elif my_skin == "farmer":
 			if farmer_scythe_level == 0:
 				farmer_scythe_pierce = 1
 				farmer_scythe_level = 1
 			elif farmer_scythe_level == 1:
-				farmer_scythe_pierce = 2
+				farmer_scythe_size_multiplier = 1.3
 				farmer_scythe_level = 2
 			elif farmer_scythe_level == 2:
-				farmer_scythe_pierce = 3
+				additional_projectiles += 1
 				farmer_scythe_level = 3
 			elif farmer_scythe_level == 3:
 				farmer_scythe_pierce = -1 
 				farmer_scythe_level = 4
 			else:
+				# TODO: Critico de guadaña
+				damage_multiplier += 0.20
+		else: # Mage
+			if additional_projectiles < 3: 
 				additional_projectiles += 1
-		else:
-			if additional_projectiles < 3: additional_projectiles += 1
-			else: attack_damage += 15
+			elif additional_projectiles == 3:
+				mage_pierce = 1
+				additional_projectiles = 4
+			else: 
+				damage_multiplier += 0.20
+				
+	# Aplicar Mejoras de Supervivencia (Carta 3)
 	elif choice == 3:
-		max_hp += 20
-		current_hp = max_hp
+		if card3_choice == "rest":
+			max_hp += 10
+			current_hp = clampi(current_hp + (max_hp / 2), 0, max_hp)
+		elif card3_choice == "regen":
+			# TODO: Añadir timer de regeneración
+			print("Regen iniciada (por hacer)")
+			
 		hud.initialize_stats(max_hp, xp_required)
 		hud.update_hp(current_hp)
 		
@@ -383,10 +454,16 @@ func _on_aura_tick_timer_timeout() -> void:
 	var enemies_in_aura = warlock_aura.get_overlapping_bodies()
 	for body in enemies_in_aura:
 		if body.has_method("take_damage") and not body.is_in_group("player"):
-			body.take_damage(attack_damage)
+			var prev_hp = body.hp
+			body.take_damage(int(attack_damage * damage_multiplier))
 			if body.has_method("apply_knockback"):
 				var push_dir = global_position.direction_to(body.global_position)
 				body.apply_knockback(push_dir, 300.0)
+				
+			if warlock_soul_reaper and prev_hp > 0 and body.hp <= 0 and heal_cooldown <= 0.0:
+				current_hp = mini(current_hp + 1, max_hp)
+				hud.update_hp(current_hp)
+				heal_cooldown = 2.0
 
 func _on_button_pressed() -> void:
 	get_tree().paused = false 
