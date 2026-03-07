@@ -2,7 +2,7 @@ extends Node
 
 # --- DATOS DE SESIÓN ---
 var game_data = {
-	"skin": "warlock",
+	"skin": "mage",
 	"token": "",
 	"difficulty": 1
 }

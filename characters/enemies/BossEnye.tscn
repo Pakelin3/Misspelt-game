@@ -44,6 +44,8 @@ autowrap_mode = 2
 shape = SubResource("CircleShape2D_55jtl")
 
 [node name="Hitbox" type="Area2D" parent="." unique_id=1039893513]
+collision_layer = 0
+collision_mask = 3
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox" unique_id=1398387685]
 shape = SubResource("CircleShape2D_mpr68")
