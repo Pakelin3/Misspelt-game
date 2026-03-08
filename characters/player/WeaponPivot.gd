@@ -45,9 +45,9 @@ func shoot():
 	var start_rotation = rotation - (spread_angle * (total_shots - 1) / 2.0)
 	
 	var pierce = 0
-	if "farmer_scythe_pierce" in player and get_parent().GameManager.game_data["skin"] == "farmer":
+	if "farmer_scythe_pierce" in player and GameManager.game_data["skin"] == "farmer":
 		pierce = player.farmer_scythe_pierce
-	elif "mage_pierce" in player and get_parent().GameManager.game_data["skin"] == "mage":
+	elif "mage_pierce" in player and GameManager.game_data["skin"] == "mage":
 		pierce = player.mage_pierce
 	
 	for i in range(total_shots):
