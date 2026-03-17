@@ -59,6 +59,11 @@ func die():
 	if not is_active: return 
 	is_active = false 
 	print("Enemigo derrotado")
+	
+	set_deferred("process_mode", Node.PROCESS_MODE_DISABLED)
+	velocity = Vector2.ZERO
+	knockback_velocity = Vector2.ZERO
+	
 	GameManager.letters_killed += 1
 	emit_signal("enemy_died", global_position, my_char)
 	

@@ -46,6 +46,21 @@ func setup(card_data: Dictionary, index: int):
 	custom_minimum_size.x = 240 
 	size_flags_vertical = Control.SIZE_EXPAND_FILL 
 	
+	var num_margin = MarginContainer.new()
+	num_margin.set_anchors_preset(Control.PRESET_TOP_RIGHT)
+	num_margin.add_theme_constant_override("margin_top", 10)
+	num_margin.add_theme_constant_override("margin_right", 10)
+	num_margin.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(num_margin)
+	
+	var num_label = Label.new()
+	num_label.text = str(choice_index)
+	num_label.add_theme_color_override("font_color", Color("#ffffffff"))
+	num_label.add_theme_font_size_override("font_size", 16)
+	num_label.add_theme_font_override("font", custom_font)
+	num_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	num_margin.add_child(num_label)
+	
 	var margin = MarginContainer.new()
 	margin.set_anchors_preset(Control.PRESET_FULL_RECT) 
 	margin.mouse_filter = Control.MOUSE_FILTER_IGNORE

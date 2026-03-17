@@ -66,6 +66,10 @@ var farmer_scythe_level: int = 0
 var farmer_scythe_pierce: int = 0
 var farmer_scythe_crit_chance: float = 0.0
 
+# --- CHEATS ---
+var secret_code_buffer: String = ""
+var cheat_invincible: bool = false
+
 
 func _ready():
 	randomize()
@@ -244,7 +248,7 @@ func move_state():
 
 
 func take_damage(amount: int):
-	if is_invincible or current_hp <= 0:
+	if is_invincible or cheat_invincible or current_hp <= 0:
 		return
 
 	var actual_damage = max(1, amount - damage_reduction)
@@ -471,6 +475,18 @@ func die():
 	set_physics_process(false)
 	weapon_pivot.set_physics_process(false)
 	shoot_timer.stop()
+	var death_canvas = CanvasLayer.new()
+	death_canvas.layer = 100 
+	var red_rect = ColorRect.new()
+	red_rect.color = Color(0.8, 0, 0, 0)
+	red_rect.set_anchors_preset(Control.PRESET_FULL_RECT)
+	death_canvas.add_child(red_rect)
+	add_child(death_canvas)
+	
+	var tween = create_tween()
+	tween.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
+	tween.tween_property(red_rect, "color", Color(0.6, 0.0, 0.0, 0.7), sfx.stream.get_length())
+	
 	await sfx.finished
 	EventBus.player_died.emit(total_xp_earned, int(time_elapsed))
 
@@ -506,3 +522,40 @@ func _on_button_pressed() -> void:
 func _on_exit_button_pressed() -> void:
 	get_tree().paused = true
 	EventBus.exit_game_requested.emit()
+
+# --- SISTEMA DE CÓDIGOS SECRETOS ---
+func _unhandled_key_input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed and not event.echo:
+		var keycode_str = OS.get_keycode_string(event.keycode)
+		if keycode_str.length() == 1 and keycode_str.to_upper() >= "A" and keycode_str.to_upper() <= "Z":
+			secret_code_buffer += keycode_str.to_upper()
+			
+			if secret_code_buffer.length() > 20:
+				secret_code_buffer = secret_code_buffer.substr(secret_code_buffer.length() - 20, 20)
+				
+			_check_secret_codes()
+
+func _check_secret_codes():
+	if secret_code_buffer.ends_with("GOD"):
+		cheat_invincible = true
+		current_hp = max_hp
+		hud.update_hp(current_hp)
+		modulate = Color(1.5, 1.5, 0.5, 1) 
+		secret_code_buffer = ""
+	
+	elif secret_code_buffer.ends_with("LEVELUP"):
+		gain_xp(xp_required - current_xp)
+		secret_code_buffer = ""
+		
+	elif secret_code_buffer.ends_with("SONIC"):
+		move_speed_multiplier *= 3.0
+		modulate = Color(0.5, 0.5, 1.5, 1)
+		secret_code_buffer = ""
+		
+	elif secret_code_buffer.ends_with("WORD"):
+		var target_word = GameManager.target_word
+		for i in range(target_word.length()):
+			if hud.is_letter_empty(i):
+				hud.set_letter(i, target_word[i])
+		check_word_completed()
+		secret_code_buffer = ""

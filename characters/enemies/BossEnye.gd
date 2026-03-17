@@ -92,7 +92,11 @@ func take_damage(amount: int):
 
 func die():
 	is_active = false
-	print("¡La Ñ ha sido domada!")
+	print("¡La Ñ ha sido domada!")	
+	set_deferred("process_mode", Node.PROCESS_MODE_DISABLED)
+	velocity = Vector2.ZERO
+	knockback_velocity = Vector2.ZERO
+	
 	GameManager.bosses_killed += 1
 	var drop = preload("res://entities/items/XPGem.tscn").instantiate()
 	drop.xp_value = 150
