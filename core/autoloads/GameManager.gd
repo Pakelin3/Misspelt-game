@@ -2,10 +2,12 @@ extends Node
 
 # --- DATOS DE SESIÓN ---
 var game_data = {
-	"skin": "mage",
+	"skin": "warlock",
 	"token": "",
 	"difficulty": 1
 }
+
+var is_tutorial_mode: bool = false
 
 var mission_words: Array = [] 
 var current_word_index: int = 0
@@ -44,6 +46,18 @@ func _load_web_parameters():
 		if params.has("skin"): game_data["skin"] = params["skin"]
 		if params.has("difficulty"): 
 			game_data["difficulty"] = int(params["difficulty"])
+		
+		# --- TUTORIAL MODE ---
+		if params.has("mode") and params["mode"] == "tutorial":
+			is_tutorial_mode = true
+			game_data["skin"] = params.get("skin", "mage")
+			game_data["difficulty"] = 1
+			mission_words = ["HOLA"]
+			current_word_index = 0
+			set_target_word("HOLA")
+			print("GameManager: MODO TUTORIAL activado.")
+			return
+		
 		if params.has("words"):
 			var raw_list = _js_window.decodeURIComponent(params["words"])
 			mission_words = raw_list.split(",")
@@ -84,6 +98,12 @@ func set_target_word(word: String):
 
 func game_event_word_completed():
 	if quiz_active: return
+	
+	# --- TUTORIAL: Skip quiz entirely ---
+	if is_tutorial_mode:
+		print("GameManager: Tutorial - Palabra completada, omitiendo quiz.")
+		return
+	
 	print("GameManager: Palabra completada. Solicitando Quiz...")
 	quiz_active = true 
 	
@@ -163,6 +183,17 @@ func send_exit_to_web():
 			_js_window.handleExitGame()
 	else:
 		print("GameManager (Editor): Exit simulado.")
+
+func send_tutorial_complete_to_web():
+	print("GameManager: Tutorial completado. Volviendo a React.")
+	is_tutorial_mode = false
+	if OS.has_feature("web") and _js_window:
+		if _js_window.handleTutorialComplete:
+			_js_window.handleTutorialComplete()
+		elif _js_window.handleExitGame:
+			_js_window.handleExitGame()
+	else:
+		print("GameManager (Editor): Tutorial completado simulado.")
 
 
 func next_word() -> bool:

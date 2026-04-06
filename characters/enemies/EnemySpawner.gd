@@ -14,10 +14,17 @@ var letter_pool: Array = []
 var gem_pool: Array = []
 
 func _ready():
+	add_to_group("enemy_spawner")
 	spawn_timer.timeout.connect(_on_spawn_timer_timeout)
 	spawn_timer.wait_time = 1.5
+	
+	# Disable auto-spawn in tutorial mode
+	if GameManager.is_tutorial_mode:
+		spawn_timer.stop()
 
 func _process(delta):
+	if GameManager.is_tutorial_mode:
+		return
 	time_since_start += delta
 	var new_level = 1 + int(time_since_start / 15.0) 
 	
@@ -87,3 +94,14 @@ func spawn_loot_deferred(spawn_pos: Vector2, char_letter: String):
 	if char_letter != "":
 		var letter = get_letter()
 		letter.activate(spawn_pos, char_letter)
+
+# --- TUTORIAL SPAWN ---
+func spawn_tutorial_enemy(letter: String) -> CharacterBody2D:
+	var enemy = get_enemy()
+	var p = get_tree().get_first_node_in_group("player")
+	var spawn_pos = Vector2(500, 300)
+	if p:
+		var angle = randf() * TAU
+		spawn_pos = p.global_position + Vector2(cos(angle), sin(angle)) * 400.0
+	enemy.activate(spawn_pos, 1, letter)
+	return enemy

@@ -250,6 +250,10 @@ func move_state():
 func take_damage(amount: int):
 	if is_invincible or cheat_invincible or current_hp <= 0:
 		return
+	
+	# Tutorial mode: player is invincible
+	if GameManager.is_tutorial_mode:
+		return
 
 	var actual_damage = max(1, amount - damage_reduction)
 	current_hp -= actual_damage
